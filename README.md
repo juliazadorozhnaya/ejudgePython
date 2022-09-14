@@ -1,4 +1,4 @@
-# EJudge_Python
+### PythonIntro2021
  
-PythonIntro2021
-Спецкурс Г.В.Курячего
+## About
+[Course info] (http://uneex.ru/LecturesCMC/PythonIntro2021)
