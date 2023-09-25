@@ -4,17 +4,24 @@
 рекомендуется использовать как можно реже.
 """
 
-import math
+def CubeSum(N):
+    A = 1
+    B = int(N ** (1 / 3))
 
-def CubeSum():
-    N = int(input())
     count = 0
-    limit = int(math.ceil(N ** (1/3)))
 
-    for A in range(1, limit + 1):
-        for B in range(A, limit + 1):
-            if A**3 + B**3 == N:
-                count += 1
+    while A <= B:
+        cubic_sum = A ** 3 + B ** 3
+        if cubic_sum == N:
+            count += 1
+
+        if cubic_sum > N:
+            B -= 1
+        else:
+            A += 1
+
     return count
 
-print(CubeSum())
+N = int(input())
+result = CubeSum(N)
+print(result)
