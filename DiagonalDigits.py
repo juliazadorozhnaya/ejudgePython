@@ -3,29 +3,28 @@
 с одинаковой суммой координат Диагонали заполняются поочерёдно сверху вниз и снизу вверх
 (таким образом формируется непрерывный «путь» из верхнего левого угла в правый нижний)"""
 
-def fill_matrix(M, N):
-    matrix = [[0] * M for _ in range(N)]  # Создаем матрицу NxM, заполненную нулями
-    current_value = 0  # Начальное значение для заполнения диагоналей
+def fill_matrix(N, M):
+    matrix = [[0] * M for _ in range(N)]
+    current_value = 0
 
-    # Заполняем матрицу по диагоналям
-    for diagonal_sum in range(M + N - 1):
-        if diagonal_sum < M:
-            row, col = 0, diagonal_sum
+    for x in range(N + M - 1):
+        if x % 2 == 0:
+            for i in range(N):
+                j = x - i
+                if 0 <= j < M:
+                    matrix[i][j] = current_value
+                    current_value = (current_value + 1) % 10
         else:
-            row, col = diagonal_sum - M + 1, M - 1
-
-        while row < N and col >= 0:
-            matrix[row][col] = current_value
-            current_value = (current_value + 1) % 10  # Зацикливаем значения от 0 до 9
-            row += 1
-            col -= 1
+            for j in range(M):
+                i = x - j
+                if 0 <= i < N:
+                    matrix[i][j] = current_value
+                    current_value = (current_value + 1) % 10
 
     return matrix
 
-# Ввод размеров матрицы
 M, N = eval(input())
 
-# Заполняем матрицу и выводим ее
-result_matrix = fill_matrix(M, N)
+result_matrix = fill_matrix(N, M)
 for row in result_matrix:
     print(" ".join(map(str, row)))
