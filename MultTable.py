@@ -7,55 +7,31 @@
 Таким образом все столбцы должны быть одинаковой ширины. Разделители вида "===…===" должны быть ширины M.
 """
 
-numbers = eval(input())
-n = numbers[0]
-m = numbers[1]
+import math
 
-kn = n
-slaglength = 0
+def print_multiplication_table(N, M):
+    len_num = len(str(N))
+    len2_num = len(str(N ** 2))
+    max_len = len_num * 2 + len2_num + 3 + 3
 
-while (kn >= 1):
-    slaglength = slaglength + 1
-    kn = kn / 10
+    one_line_count = math.floor((M - max_len) / (max_len + 3)) + 1
+    line_rows = math.ceil(N / one_line_count)
 
-kn = n * n
-sumlength = 0
+    form = "{:.>{}}.*.{:.<{}}.=.{:.<{}}"
 
-while (kn >= 1):
-    sumlength = sumlength + 1
-    kn = kn / 10
+    print("=" * M)
 
-kn = 0
-strl = slaglength + 3 + slaglength + 3 + sumlength
+    for i in range(1, line_rows + 1):
+        for second in range(1, N + 1):
+            start = (i - 1) * one_line_count + 1
+            end = i * one_line_count + 1 if i * one_line_count < N else N + 1
 
-maxcolc = int(m / strl)
-strl = strl + (maxcolc - 1) * 3 / maxcolc
-maxcolc = int(m / strl)
-currentMn = 1
-check = 0
+            for first in range(start, end):
+                equation = form.format(first, len_num, second, len_num, first * second, len2_num)
+                print(equation, end=(".|." if first != end - 1 else "\n"))
 
-while (kn <= n):
-    check = 0
-    for i in range(0, m):
-        print('=', end='')
+        print("=" * M)
 
-    print()
+N, M = map(int, input("").split(","))
+print_multiplication_table(N, M)
 
-    for j in range(1, n + 1):
-        for i in range(currentMn, currentMn + maxcolc):
-            if (i <= n):
-                check = 1
-                if ((i < currentMn + maxcolc - 1) and (i != n)):
-                    print("{f:<{slagl}} * {s:<{slagl}} = {t:<{suml}} | ".format(f=i, s=j, t=i * j, slagl=slaglength,
-                                                                                suml=sumlength), end='')
-                else:
-                    print("{f:<{slagl}} * {s:<{slagl}} = {t:<{suml}}".format(f=i, s=j, t=i * j, slagl=slaglength,
-                                                                             suml=sumlength), end='')
-        print()
-
-    currentMn = currentMn + maxcolc
-    kn = kn + maxcolc
-
-if (check == 1):
-    for i in range(0, m):
-        print('=', end='')
