@@ -1,67 +1,61 @@
+"""
+Написать класс Triangle, моделирующий треугольник: объект tri типа Triangle создаётся из трёх вещественных чисел — сторон треугольника
+tri пуст, если не выполняется строгое неравенство треугольника или хотя бы одна из сторон не положительна abs(tri) — площадь треугольника
+(0, если tri пуст) два объекта tri1 и tri2 типа Triangle равны, только если попарно равны их стороны (в некотором порядке) равенство
+необходимо определять с помощью isclose() сравнение на неравенство двух объектов типа Triangle есть результат сравнения их площадей (независимо от того,
+равны ли треугольники в указанном выше смысле) (на всякий случай) площадь вычисляется по формуле Герона строковое
+представление: a:b:c, где a, b и c — это стороны треугольника в порядке их задания
+"""
+
+import math
+
 class Triangle:
+    sides = []
+
     a = 0
     b = 0
     c = 0
     emp = 0
 
-    def __init__(self, *arg):
-        self.a = arg[0]
-        self.b = arg[1]
-        self.c = arg[2]
+    def __init__(self, a=0, b=0, c=0):
+        self.a = a
+        self.b = b
+        self.c = c
+        self.sides = [float(a), float(b), float(c)]
 
-        if ((self.a <= 0) or (self.b <= 0) or (self.c <= 0) or (self.a + self.b < self.c) or (
-                self.a + self.c < self.b) or (self.c + self.b < self.a)):
+        if (self.a <= 0) or (self.b <= 0) or (self.c <= 0) or (self.a + self.b < self.c) or (self.a + self.c < self.b) or (self.c + self.b < self.a):
             self.emp = 1
-
-    def __abs__(self):
-        p = (self.a + self.b + self.c) / 2
-
-        if self.emp == 1:
-            return 0
-        else:
-            return (p * (p - self.a) * (p - self.b) * (p - self.c))**(1/2)
-
-    def __eq__(self, obj):
-        if ((self.a == obj.a) or (self.a == obj.b) or (self.a == obj.c)) or ((self.b == obj.a) or (self.b == obj.b) or (self.b == obj.c)) or ((self.c == obj.a) or (self.c == obj.b) or (self.c == obj.c)):
-            return True
-            #if (self.b == obj.a) or (self.b == obj.b) or (self.b == obj.c):
-               # if (self.c == obj.a) or (self.c == obj.b) or (self.c == obj.c):
-                    #return True
-        return False
-
-    def __ne__(self, obj):
-        if self.__abs__() == obj.__abs__():
-            return False
-        return True
 
     def __bool__(self):
         if self.emp == 0:
             return True
         return False
 
-    def __lt__(self, obj):
-        if self.__abs__() < obj.__abs__():
-            return True
-        return False
-
-    def __gt__(self, obj):
-        if self.__abs__() > obj.__abs__():
-            return True
-        return False
-
-    def __le__(self, obj):
-        if self.__abs__() <= obj.__abs__():
-            return True
-        return False
-
-    def __ge__(self, obj):
-        if self.__abs__() >= obj.__abs__():
-            return True
-        return False
+    def __abs__(self):
+        if self.sides[0] + self.sides[1] <= self.sides[2] or self.sides[1] + self.sides[2] <= self.sides[0] or self.sides[0] + self.sides[2] <= self.sides[1]:
+            return 0
+        p = sum(self.sides) / 2
+        return math.sqrt(p * (p - self.sides[0]) * (p - self.sides[1]) * (p - self.sides[2]))
 
     def __str__(self):
         s = ""
-        s += "{:.1f}".format(self.a)
-        s += ":{:.1f}".format(self.b)
-        s += ":{:.1f}".format(self.c)
+        sides = [self.sides[0], self.sides[1], self.sides[2]]
+        s += "{:.1f}".format(sides[0])
+        s += ":{:.1f}".format(sides[1])
+        s += ":{:.1f}".format(sides[2])
         return s
+
+    def __eq__(self, other):
+        return all(i == j for i, j in zip(sorted(self.sides), sorted(other.sides)))
+
+    def __lt__(self, other):
+        return abs(self) < abs(other)
+
+    def __gt__(self, other):
+        return abs(self) > abs(other)
+
+    def __le__(self, other):
+        return abs(self) <= abs(other)
+
+    def __ge__(self, other):
+        return abs(self) >= abs(other)
