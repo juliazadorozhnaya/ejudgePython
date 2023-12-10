@@ -1,18 +1,49 @@
-def Record(slots_str, **fields):
-    def decorator(cls):
-        class Wrapped(cls):
-            __slots__ = sorted(slots_str.split())
+x, y = 0, 0
+last_direction = None
 
-            def __iter__(self):
-                return iter(sorted(self.__slots__ + [field for field in fields if not field.startswith("_")]))
+while True:
+    command = input().split()
 
-            def __str__(self):
-                return "|".join(f"{attr}={getattr(self, attr)}" if hasattr(self, attr) else attr for attr in self)
+    if not command:
+        break
 
-        for field, value in fields.items():
-            if not field.startswith("_"):
-                setattr(Wrapped, field, property(lambda self, value=value: value))
+    match command[0] if command else None:
+        case "move" if len(command) == 2 and command[1] in {'s', 'n', 'w', 'e'}:
+            direction = command[1]
+            last_direction = direction
+            match direction:
+                case 's':
+                    y -= 1
+                case 'n':
+                    y += 1
+                case 'w':
+                    x -= 1
+                case 'e':
+                    x += 1
+        case "move":
+            match last_direction:
+                case 's':
+                    y -= 1
+                case 'n':
+                    y += 1
+                case 'w':
+                    x -= 1
+                case 'e':
+                    x += 1
+        case "info" if len(command) == 2 and command[1] in {'x', 'y', 'xy'}:
+            info_type = command[1]
+            match info_type:
+                case 'x':
+                    print(x)
+                case 'y':
+                    print(y)
+                case 'xy':
+                    print(f"{x} {y}")
+        case "say":
+            print(' '.join(command[1:]))
+        case _:
+            if command and command[0] != "jump":
+                print(f"Cannot move to {' '.join(command[1:])}")
 
-        return Wrapped
-
-    return decorator
+# Выполнение команды info xy перед выходом из программы
+print(f"{x} {y}")

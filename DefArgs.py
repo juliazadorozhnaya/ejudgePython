@@ -1,43 +1,31 @@
-from inspect import signature
-
+"""
+Написать параметрический декоратор (функцию или класс) DefArgs(*константы), которым можно декорировать функции
+с фиксированным числом позиционных параметров. Возвращаемая им функция должна принимать произвольное количество позиционных
+параметров, не большее чем у исходной функции. Все опущенные параметры должны получать соответствующие их позиции значения
+из кортежа константы. Если констант меньше, чем параметров декорируемой функции, декоратор инициирует исключение TypeError.
+Это же исключение инициируется при вызове функции со слишком большим количеством параметров. Дополнительно декоратор должен
+проверять, что тип параметров при вызове соответствует типу констант, в противном случае также инициировать исключение TypeError.
+"""
 
 def DefArgs(*constants):
     def decorator(func):
-        argum = len(signature(func).parameters)
-        if len(constants) < argum:
+
+        funcArg = func.__code__.co_argcount
+        if len(constants) < funcArg:
             raise TypeError()
 
-        def wrapper(*args, **kwargs):
-            if len(args) > func.__code__.co_argcount:
-                raise TypeError("Too many arguments for the decorated function")
+        def wrapper(*args):
+            if len(args) > funcArg:
+                raise TypeError()
 
             for i, arg in enumerate(args):
                 if not isinstance(arg, type(constants[i])):
-                    raise TypeError(f"Argument {i + 1} must be of type {type(constants[i])}")
+                    raise TypeError()
 
-            kwargs.update(zip(func.__code__.co_varnames[len(args):], constants[len(args):]))
+            far = args + constants[len(args):funcArg]
 
-            return func(*args, **kwargs)
+            return func(*far)
 
         return wrapper
 
     return decorator
-
-
-@DefArgs(2, 3, 4)
-def mult(a, b):
-    return a * b
-
-
-for args in (), (4,), (7, 8), (7, 8, 9), ("q", "w"):
-    try:
-        print(mult(*args))
-    except TypeError:
-        print("Nope")
-
-try:
-    @DefArgs(2)
-    def mult(a, b):
-        return a * b
-except TypeError:
-    print("Nope")

@@ -14,27 +14,15 @@ class Tester:
     def __init__(self, func):
         self.func = func
 
-    def __call__(self, suites, allowed=None, **kwargs):
-        allowed = allowed or []
-        errors = []
-        for suite in suites:
+    def __call__(self, suite, allowed=()):
+        result = 0
+
+        for s in suite:
             try:
-                self.func(*suite)
+                self.func(*s)
+            except tuple(allowed) as e:
+                result = -1
             except Exception as e:
-                errors.append(e)
+                return 1
 
-        if not errors:
-            return 0
-        return -1 if all(isinstance(error, tuple(allowed)) or isinstance(error, Exception) for error in errors) else 1
-
-
-def req(x):
-    if x <= 0:
-        return x + 1
-    else:
-        return 2 * x + req(x - 1)
-
-
-T = Tester(req)
-print(T((el,) for el in range(0, 100)))
-print(T((el,) for el in range(200, 1500)))
+        return result

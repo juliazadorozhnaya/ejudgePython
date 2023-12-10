@@ -1,15 +1,18 @@
-
-class Struct:
-    def __getattribute__(self, item):
-        if item.startswith('_') or (len(item) == 4 and all(char in 'abcd' for char in item)):
-            return item
-        else:
-            raise AttributeError
+"""
+Написать класс Struct, элементы которого будут содержать поля, соответствующие всем возможным четырёхбуквенным последовательностям
+из букв a, b, c и d (от aaaa до dddd). Попытка обращения к полям с любыми другими именами (кроме начинающихся на «_») должна
+приводить к исключению AttributeError. Записывать что-либо в объекты этого класса не предполагается, но предполагается делать
+много его экземпляров. Необязательное упражнение: уложить описание класса в одну строку (а с помощью itertools — вполне компактную).
+Или хотя бы в две.
+"""
 
 from itertools import product
-from collections import Counter
 
-lst = [Struct() for i in range(1000000)]
-FIELDS = ["".join(q) for q in product(*(["abcd"] * 4))]
-res = Counter(getattr(l, FIELDS[i % len(FIELDS)]) for i, l in enumerate(lst))
-print(sorted(set(res.values())))
+class Struct:
+    __slots__ = []
+    _s = frozenset(map(''.join, product('abcd', repeat=4)))
+
+    def __getattribute__(self, attr):
+        if attr in Struct._s:
+            return attr
+        raise AttributeError()
