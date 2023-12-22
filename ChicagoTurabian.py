@@ -26,22 +26,6 @@ Frey, Roger. Utility and Rights. Minneapolis: University of Minnesota Press, 198
 
 True
 """
-import re
-
-def parse_N(reference):
-    prefix = r"\d+\.\s"
-    authorN = r"(?:" + r"(?P<author41>.+)\s(?P<author42>[^\s,]+)\set\sal\." + r"|" + r"(?P<author211>[^,]+)\s(?P<author212>\S+)\sand\s(?P<author22>[^,]+)" + r"|" + r"(?P<author11>[^,]+)\s(?P<author12>[^\s,]+)" + r"(?:(?:(?:,\s(?P<author3>.+),)?\sand\s(?P<author2>[^,]+)))?" + r")" + r",\s"
-    titleN = r"(?P<title>.+)\s\("
-    cityN = r"(?P<city>.+):\s"
-    publisherN = r"(?P<publisher>.+),\s"
-    dateN = r"(?P<date>\d+)\),\s"
-    pageN = r"(?:(?:\d+|\d+-\d+))\."
-    Nt = prefix + authorN + titleN + cityN + publisherN + dateN + pageN
-
-    match_N = re.search(Nt, reference)
-    if match_N:
-        return {k: v for k, v in match_N.groupdict().items() if v is not None}
-    return None
 
 
 

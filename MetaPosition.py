@@ -1,38 +1,30 @@
+"""
+Написать метакласс posistioned, который добавляет в создаваемый с его помощью класс три свойства:
+Строковое представление экземпляра этого класса должно выглядеть как "поле1=значение1 поле2=значение2 …" для всех аннотированных
+полей этого класса (в порядке их появления в аннотации). При создании экземпляра класса ему можно передавать произвольное
+количество параметров (включая ноль). Первый параметр инициализирует первое аннотированное поле в этом экземпляре,
+второй — второе и т. д.; если параметров больше, чем аннотированных полей, они отбрасываются
+При сопоставлении шаблону допускается позиционное сопоставление с аннотированными полями (в порядке появления в аннотации)
+"""
+
 class positioned(type):
     def __new__(cls, name, bases, namespace):
-        annotations = namespace.get("__annotations__", {})
-        fields = list(annotations.keys())
+        annotations = namespace.get('__annotations__', {})
+        namespace['_fields'] = list(annotations.keys())
+        namespace['__match_args__'] = tuple(namespace['_fields'])
 
-        def __init__(self, *args):
-            for attr, value in zip(fields, args):
-                setattr(self, attr, value)
+        def __init__(self, *args, **kwargs):
+            defaults = {field: getattr(self, field, None) for field in self._fields}
+            values = dict(zip(self._fields, args), **kwargs)
+            for field in self._fields:
+                setattr(self, field, values.get(field, defaults[field]))
+
+        namespace['__init__'] = __init__
 
         def __str__(self):
-            return ' '.join(f"{attr}={getattr(self, attr)}" for attr in fields)
+            return ' '.join(f"{field}={getattr(self, field, None)}" for field in self._fields)
 
-        def __match_args__(self):
-            return tuple(getattr(self, attr) for attr in fields)
-
-        namespace["__init__"] = __init__
-        namespace["__str__"] = __str__
-        namespace["__match_args__"] = __match_args__
+        namespace['__str__'] = __str__
 
         return super().__new__(cls, name, bases, namespace)
 
-
-
-class C(metaclass=positioned):
-    a: int = 1
-    b: float = 42.0
-
-for c in C(), C(4), C(100.0, 500), C(7, 2):
-    print(c)
-    match c:
-        case C(1):
-            print("C1", c.b)
-        case C(b=42):
-            print("C42", c.a)
-        case C(100, 500):
-            print("C100500")
-        case C():
-            print("C", c)

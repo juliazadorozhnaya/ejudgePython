@@ -1,58 +1,75 @@
-x, y = 0, 0
-last_direction = None
+# Correcting the syntax and redefining the turtle interpreter function.
 
-while True:
-    command = input("")
-    if not command:
-        break
+def turtle_interpreter(commands):
+    x, y = 0, 0  # Turtle's starting position
+    last_move = None  # Last move made by the turtle
 
-    match command.split()[0]:
-        case "move":
-            direction = command.split()[1] if len(command.split()) > 1 else last_direction
-            match direction:
-                case "n":
-                    y += 1
-                    last_direction = "n"
-                case "s":
-                    y -= 1
-                    last_direction = "s"
-                case "e":
-                    x += 1
-                    last_direction = "e"
-                case "w":
-                    x -= 1
-                    last_direction = "w"
-                case _:
-                    print(f"Cannot move to {direction}")
-        case "retreat":
-            if last_direction:
-                match last_direction:
-                    case "n":
-                        y -= 1
-                    case "s":
-                        y += 1
-                    case "e":
-                        x -= 1
-                    case "w":
-                        x += 1
+    # Define a function to update the turtle's position based on the direction.
+    def move(direction):
+        nonlocal x, y, last_move
+        if direction == 'n':
+            y += 1
+        elif direction == 's':
+            y -= 1
+        elif direction == 'e':
+            x += 1
+        elif direction == 'w':
+            x -= 1
+        last_move = direction
+
+    # Define a function to retreat based on the last move.
+    def retreat():
+        nonlocal last_move
+        if last_move == 'n':
+            move('s')
+        elif last_move == 's':
+            move('n')
+        elif last_move == 'e':
+            move('w')
+        elif last_move == 'w':
+            move('e')
+
+    # Process each command in the input.
+    output = []
+    for command in commands:
+        words = command.split()
+        if words[0] == 'move':
+            if len(words) == 2 and words[1] in ['n', 's', 'e', 'w']:
+                move(words[1])
+            elif len(words) == 1 and last_move:
+                move(last_move)
             else:
-                print("Cannot retreat without previous move")
-        case "info":
-            if len(command.split()) > 1:
-                what = command.split()[1]
-                match what:
-                    case "x":
-                        print(x)
-                    case "y":
-                        print(y)
-                    case "xy":
-                        print(f"{x} {y}")
-            else:
-                print("Invalid info command")
-        case "say":
-            print(' '.join(command[1:]))
-        case _:
-            if command and command[0] != "jump":
-                print(f"Cannot move to {' '.join(command[1:])}")
+                output.append(f"Cannot move to {words[1]}")
+        elif words[0] == 'retreat':
+            retreat()
+        elif words[0] == 'info':
+            if words[1] == 'x':
+                output.append(str(x))
+            elif words[1] == 'y':
+                output.append(str(y))
+            elif words[1] == 'xy':
+                output.append(f"{x} {y}")
+        elif words[0] == 'say':
+            output.append(' '.join(words[1:]))
+        # Ignoring other commands
 
-print(x, y)
+    # Execute the additional "info xy" command before exiting the program.
+    output.append(f"{x} {y}")
+    return output
+
+commands = [
+    "say Hello, world!",
+    "move n",
+    "move e",
+    "jump",
+    "info xy",
+    "move n",
+    "move base",
+    "look around",
+    "info x",
+    "retreat",
+    "retreat",
+    "info y"
+]
+# Run the turtle interpreter and print the output.
+turtle_interpreter(commands)

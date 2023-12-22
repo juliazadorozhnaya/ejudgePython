@@ -13,6 +13,6 @@ class Struct:
     _s = frozenset(map(''.join, product('abcd', repeat=4)))
 
     def __getattribute__(self, attr):
-        if attr in Struct._s:
+       if attr in Struct._s:
             return attr
-        raise AttributeError()
+       raise AttributeError()
