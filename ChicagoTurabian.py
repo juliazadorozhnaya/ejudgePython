@@ -29,8 +29,25 @@ True
 
 
 
+import re
+
+def parse_N(reference):
+    # Regex to capture various parts of the N reference
+    authorN = r"(?P<authorN>[^.]+),\s"
+    titleN = r"(?P<title>.+)\s\("
+    cityN = r"(?P<city>.+):\s"
+    publisherN = r"(?P<publisher>.+),\s"
+    dateN = r"(?P<date>\d+)\)"
+    Nt = authorN + titleN + cityN + publisherN + dateN
+
+    match_N = re.search(Nt, reference)
+    if match_N:
+        return match_N.groupdict()
+    return None
+
 def parse_B(reference):
-    authorB = r"(?P<author12>\S+),\s(?P<author11>[^,]+)(?:,(?:\s(?P<author3>[^,]+),)?(?:\s(?P<author4>[^,]+),)*\sand\s(?P<author2>[^\d]+))?" + r"\.\s"
+    # Regex to capture various parts of the B reference
+    authorB = r"(?P<authorB>[^.]+)\.\s"
     titleB = r"(?P<title>.+)\.\s"
     cityB = r"(?P<city>.+):\s"
     publisherB = r"(?P<publisher>.+),\s"
@@ -39,18 +56,38 @@ def parse_B(reference):
 
     match_B = re.search(Bt, reference)
     if match_B:
-        return {k: v for k, v in match_B.groupdict().items() if v is not None}
+        return match_B.groupdict()
     return None
 
-N_reference = input()
-B_reference = input()
+def standardize_authors(authors):
+    # Standardize author names to a common format for comparison
+    authors = authors.replace(" and ", ", ").replace(" et al.", "")
+    author_list = authors.split(", ")
+    standardized = set()
+    for author in author_list:
+        parts = author.split(" ")
+        if len(parts) > 1:
+            standardized.add(parts[-1] + ", " + " ".join(parts[:-1]))
+    return standardized
+
+def compare_references(N, B):
+    if N is not None and B is not None:
+        authors_N = standardize_authors(N["authorN"])
+        authors_B = standardize_authors(B["authorB"])
+        return (authors_N == authors_B and
+                N["title"] == B["title"] and
+                N["city"] == B["city"] and
+                N["publisher"] == B["publisher"] and
+                N["date"] == B["date"])
+    return False
+
+N_reference = input("Enter N reference: ")
+B_reference = input("Enter B reference: ")
 
 N_parsed = parse_N(N_reference)
-print(N_parsed)
 B_parsed = parse_B(B_reference)
-print(B_parsed)
 
-if N_parsed is not None and B_parsed is not None and all(N_parsed.get(key) == B_parsed.get(key) for key in N_parsed):
+if compare_references(N_parsed, B_parsed):
     print("True")
 else:
     print("False")

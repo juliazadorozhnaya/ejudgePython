@@ -7,46 +7,46 @@ class Smile:
             return ""
 
         abs_size = abs(self.size)
-        width = abs_size * 2 + 3
-        height = abs_size + 3
+        width = abs_size * 2 + 1
+        eye_row = abs_size // 4
+        mouth_row = 3 * abs_size // 4
+        smile_string = ""
+
+        # First line with size
+        smile_string += "/" + str(abs_size) + "-" * (width - 4) + "\\\n"
+
+        # Upper empty part
+        for i in range(eye_row - 1):
+            smile_string += "|" + " " * (width - 2) + "|\n"
+
+        # Eyes
         eye_pos = abs_size // 4
-        mouth_pos = abs_size // 2
+        if self.size > 0:
+            smile_string += "|" + " " * eye_pos + "O" + " " * (width - 2 * eye_pos - 2) + "O" + " " * eye_pos + "|\n"
+        else:
+            smile_string += "|" + " " * eye_pos + "0" + " " * (width - 2 * eye_pos - 2) + "0" + " " * eye_pos + "|\n"
 
-        smiley = [[" " for _ in range(width)] for _ in range(height)]
+        # Middle empty part
+        for i in range(mouth_row - eye_row - 1):
+            smile_string += "|" + " " * (width - 2) + "|\n"
 
-        # Set borders and corners
-        for i in range(width):
-            smiley[0][i] = smiley[-1][i] = "-"
-        for i in range(height):
-            smiley[i][0] = smiley[i][-1] = "|"
-        smiley[0][0] = smiley[-1][-1] = "/"
-        smiley[0][-1] = smiley[-1][0] = "\\"
+        # Mouth
+        smile_string += "|" + " " * (eye_pos + 1) + "-" * (width - 2 * (eye_pos + 1) - 2) + " " * (eye_pos + 1) + "|\n"
 
-        # Set eyes and mouth
-        if abs_size > 0:
-            smiley[eye_pos + 1][eye_pos + 2] = smiley[eye_pos + 1][-eye_pos - 3] = "O"
-            for i in range(eye_pos + 2, width - eye_pos - 2):
-                smiley[mouth_pos + 1][i] = "-"
+        # Bottom empty part
+        for i in range(abs_size - mouth_row - 1):
+            smile_string += "|" + " " * (width - 2) + "|\n"
 
-        # Insert size at the top left
-        size_str = str(abs(self.size))  # Use absolute value for size
-        for i, char in enumerate(size_str):
-            smiley[0][i + 1] = char
+        # Last line
+        smile_string += "\\" + "-" * (width - 2) + "/"
 
-        # Flip if size is negative
-        if self.size < 0:
-            smiley = smiley[::-1]
-            # Move size to the bottom left
-            for i, char in enumerate(size_str):
-                smiley[-1][i + 1] = char
-
-        return "\n".join("".join(row) for row in smiley)
-
-    def __neg__(self):
-        return Smile(-self.size)
+        return smile_string
 
     def __abs__(self):
         return abs(self.size)
+
+    def __neg__(self):
+        return Smile(-self.size)
 
     def __add__(self, other):
         return Smile(self.size + other.size)
@@ -56,7 +56,6 @@ class Smile:
 
     def __mul__(self, number):
         return Smile(self.size * number)
-
 
 print(abs(Smile(-2)))
 print(Smile(1))
